@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>框架设计上的十点基本常识</title></head><body>　　<div class="inner"><h2>框架设计上的十点基本常识</h2><p>最近一直在开发框架,对框架的设计有很多的疑惑,梁飞大神的这篇文章让我有了更多认识.这里收藏一下.也推荐阅读原文  :)</p>
+<ol>
+<li><p>API 和 SPI 分离（用户 API 和 扩展 API 分离）</p>
+</li>
+<li><p>实体域（核心领域模型）， 服务域，会话域</p>
+</li>
+<li><p>在重要的过程上设置拦截接口（过滤器），允许外置行为，这是基本扩展方式</p>
+</li>
+<li><p>在重要的状态上留出监听事件接口</p>
+</li>
+<li><p>接口职责要单一，具有可组合性</p>
+</li>
+<li><p>微核插件式，平等对待第三方。微核不带有功能性，而是一个生命周期和集成容器，例如Spring 的 BeanFactory。<br> 平等对待第三方，则是作者要把自己当扩展者。</p>
+</li>
+<li><p>不要控制外部对象的生命周期，框架只需使用这些实例</p>
+</li>
+<li><p>可配置一定可编程，保持友好的默认约定</p>
+</li>
+<li><p>区分命令与查询，查询一定幂等、无副作用，命令一定是 void。方法尽量前置断言，类似 Spring。</p>
+</li>
+</ol>
+<p>10 增量实扩展，而不是扩展式扩展，不要扩充原始核心概念。</p>
+<p>参考：梁飞博客</p>
+<p><a href="http://javatar.iteye.com/blog/706098" target="_blank" rel="noopener">http://javatar.iteye.com/blog/706098</a></p>
+<p><a href="http://javatar.iteye.com/blog/690845" target="_blank" rel="noopener">http://javatar.iteye.com/blog/690845</a></p>
+</div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

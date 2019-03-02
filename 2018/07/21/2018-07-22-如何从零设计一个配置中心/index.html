@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>如何从零设计一个配置中心</title></head><body>　　<div class="inner"><h2>如何从零设计一个配置中心</h2><h2 id="0-大概需要哪些组件？"><a href="#0-大概需要哪些组件？" class="headerlink" title="0. 大概需要哪些组件？"></a>0. 大概需要哪些组件？</h2><ol>
+<li>无状态的配置服务 Service</li>
+<li>软负载 Client，自动刷新配置</li>
+<li>服务接入注册中心 Eureka</li>
+<li>人性化的 WEB 控制台 </li>
+<li>持久化配置 DB</li>
+<li>MQ 消息组件，异步解耦客户端和 WEB 控制台。</li>
+</ol>
+<p>下图是分布式配置中心架构图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-a98883a6918cb8c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<h2 id="1-Client-功能："><a href="#1-Client-功能：" class="headerlink" title="1. Client 功能："></a>1. Client 功能：</h2><ol>
+<li>软负载</li>
+<li>服务发现（简洁部署时可不需要注册中心）</li>
+<li>获取配置</li>
+<li>长连接配置中心，支持服务端 push。</li>
+<li>支持自动刷新配置，支持监听配置变化。</li>
+<li>兼容 Spring</li>
+<li>支持插件，支持用户做配置加解密操作。</li>
+<li>Client 最好无配置，全部存放配置中心。</li>
+<li>本地文件缓存。</li>
+</ol>
+<h2 id="2-Service-功能："><a href="#2-Service-功能：" class="headerlink" title="2. Service 功能："></a>2. Service 功能：</h2><ol start="0">
+<li>服务注册，使客户端发现，简洁部署时可不需要注册中心。</li>
+<li>支持海量客户端长连接。</li>
+<li>无状态集群，高可用。</li>
+<li>MQ 消费者，消费 WEB 控制台的消息并通知客户端。</li>
+<li>支持客户端主动获取配置和被动获取配置。</li>
+<li>支持和 WEB 控制合并部署。</li>
+</ol>
+<h2 id="3-WEB-控制台功能："><a href="#3-WEB-控制台功能：" class="headerlink" title="3. WEB 控制台功能："></a>3. WEB 控制台功能：</h2><ol>
+<li>支持多环境，多应用，每个环境和应用对应不同权限。</li>
+<li>支持灰度发布。</li>
+<li>支持发布回滚。</li>
+<li>配置权限管理，消息发布审计，消息获取审计。</li>
+<li>支持第三方服务 restful 调用。</li>
+<li>支持和 Service 合并部署。</li>
+</ol>
+<h2 id="4-支持简洁部署："><a href="#4-支持简洁部署：" class="headerlink" title="4. 支持简洁部署："></a>4. 支持简洁部署：</h2><p>分布式配置中心部署较为复杂，组件较多。</p>
+<p>简洁部署适用于那些测试配置中心的用户，或者对可用性不是特别高的用户（Client 本地有文件缓存，Service 挂了也不影响）。</p>
+<p>WEB 控制台，Service 可只使用一个 JVM，MQ 使用阻塞队列代替。Client 提供 Maven Jar 包。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-5a78973e5942f6cd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/ctripcorp/apollo/wiki/Apollo%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E4%BB%8B%E7%BB%8D" target="_blank" rel="noopener">apollo 配置中心介绍</a></p>
+</div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

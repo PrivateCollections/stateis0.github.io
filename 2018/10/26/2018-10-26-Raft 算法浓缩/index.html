@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>Raft 算法浓缩</title></head><body>　　<div class="inner"><h2>Raft 算法浓缩</h2><h2 id="Raft-算法浓缩总结"><a href="#Raft-算法浓缩总结" class="headerlink" title="Raft 算法浓缩总结"></a>Raft 算法浓缩总结</h2><p>Raft 论文给出了下面的表格，用于总结 Raft 算法精华 。</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>选举安全特性</td>
+<td>对于一个给定的任期号，最多只会有一个领导人被选举出来</td>
+</tr>
+<tr>
+<td>领导人只附加原则</td>
+<td>领导人绝对不会删除或者覆盖自己的日志，只会增加</td>
+</tr>
+<tr>
+<td>日志匹配原则</td>
+<td>如果两个日志在相同的索引位置的日志条目的任期号相同，那么我们就认为这个日志从头到这个索引位置之间全部完全相同</td>
+</tr>
+<tr>
+<td>领导人完全特性</td>
+<td>如果某个日志条目在某个任期号中已经被提交，那么这个条目必然出现在更大任期号的所有领导人中</td>
+</tr>
+<tr>
+<td>状态机安全特性</td>
+<td>如果一个领导人已经在给定的索引值位置的日志条目应用到状态机中，那么其他任何的服务器在这个索引位置不会提交一个不同的日志</td>
+</tr>
+</tbody>
+</table>
+<p>实际上，这些精华都是一条条限制推出来的。让我们一起看看是怎么推出来的。</p>
+<h2 id="选举安全特性"><a href="#选举安全特性" class="headerlink" title="选举安全特性"></a>选举安全特性</h2><p>描述： 对于一个给定的任期号，最多只会有一个领导人被选举出来</p>
+<p>如何实现？</p>
+<p>Raft 规定：每个节点最多只会对一个任期号投出一张选票，按照先来先服务的原则（随机时间的重要性），同时，当一个候选人从整个集群的大多数节点获得了<strong>针对同一个任期号</strong>的选票，那么他就赢得了这次选举并成为领导人。</p>
+<h2 id="领导人只附加原则"><a href="#领导人只附加原则" class="headerlink" title="领导人只附加原则"></a>领导人只附加原则</h2><p>描述：领导人绝对不会删除或者覆盖自己的日志，只会增加。</p>
+<p>这个不需要保证别的规则保证，服务器自己搞定。</p>
+<h2 id="日志匹配原则"><a href="#日志匹配原则" class="headerlink" title="日志匹配原则"></a>日志匹配原则</h2><p>描述：如果两个日志在相同的索引位置的日志条目的任期号相同，那么我们就认为这个日志从头到这个索引位置之间全部完全相同。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-25e7f8f15615e9dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>如何实现？</p>
+<p>Raft 维护着以下特性：</p>
+<ul>
+<li>如果在不同的日志中的两个条目拥有相同的索引和任期号，那么他们存储了相同的指令。</li>
+<li>如果在不同的日志中的两个条目拥有相同的索引和任期号，那么他们之前的所有日志条目也全部相同。</li>
+</ul>
+<p>第一个特性来自这样的一个事实，领导人最多在<strong>一个任期</strong>里在指定的<strong>一个日志索引位置</strong>创建<strong>一条日志条目</strong>，同时日志条目在日志中的位置也从来不会改变。</p>
+<p>第二个特性由附加日志 RPC 的一个简单的一致性检查所保证。在发送附加日志 RPC 的时候，领导人会把新的日志条目紧接着之前的条目的索引位置和任期号包含在里面。如果跟随者在它的日志中找不到包含相同索引位置和任期号的条目，那么他就会拒绝接收新的日志条目。</p>
+<h2 id="领导人完全特性"><a href="#领导人完全特性" class="headerlink" title="领导人完全特性"></a>领导人完全特性</h2><p>解释：如果某个日志条目在某个任期号中已经被提交，那么这个条目必然出现在更大任期号的所有领导人中。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-d0fa48517ec9a58f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>规则保证：</p>
+<p>当一个 leader 提交了某条日志，然后崩溃了，候选者如果想当选 leader，必须满足以下条件：</p>
+<ol>
+<li>首先比较任期号，谁都任期号大，谁就新。</li>
+<li>如果任期号相同，那谁的日志长，谁就新。</li>
+<li>获取过半投票者的选票。</li>
+</ol>
+<p>同时，需要满足：leader 只能在自己当前任期的日志满足多数规则时，才能提交。</p>
+<p>所以，当之前的 leader 成功提交最后一条日志，后面的候选者，必须包含过半已提交的最后一条日志的投票者的选票，才能成为 leader。</p>
+<h2 id="状态机安全特性"><a href="#状态机安全特性" class="headerlink" title="状态机安全特性"></a>状态机安全特性</h2><p>描述： 如果一个领导人已经在给定的索引值位置的日志条目应用到状态机中，那么其他任何的服务器在这个索引位置不会提交一个不同的日志。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-9864c6e0e794b0fb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>解释：</p>
+<p>通过领导人完全特性，我们就能证明状态机安全特性，即如果已经服务器已经在某个给定的索引值应用了日志条目到自己的状态机里，那么其他的服务器不会应用一个不一样的日志到同一个索引值上。</p>
+<p>在一个服务器应用一条日志条目到他自己的状态机中时，他的日志必须和领导人的日志，在该条目和之前的条目上相同，并且已经被提交。</p>
+<p>现在我们来考虑在任何一个服务器应用一个指定索引位置的日志的最小任期；日志完全特性保证拥有更高任期号的领导人会存储相同的日志条目，所以之后的任期里应用某个索引位置的日志条目也会是相同的值。因此，状态机安全特性是成立的。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf" target="_blank" rel="noopener">英文 paper  pdf 地址</a></p>
+<p><a href="https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md" target="_blank" rel="noopener">Raft paper 中文翻译 —— 寻找一种易于理解的一致性算法（扩展版）</a></p>
+<p><a href="https://www.youtube.com/watch?v=YbZ3zDzDnrw&amp;feature=youtu.be" target="_blank" rel="noopener">Raft 作者讲解视频</a></p>
+<p><a href="http://www2.cs.uh.edu/~paris/6360/PowerPoint/Raft.ppt" target="_blank" rel="noopener">Raft 作者讲解视频对应的 PPT</a></p>
+<p><a href="http://thesecretlivesofdata.com/raft/" target="_blank" rel="noopener">一个简单的讲解 Raft 协议的动画</a></p>
+</div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

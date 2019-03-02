@@ -1,0 +1,9 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>计算器和运算器</title></head><body>　　<div class="inner"><h2>计算器和运算器</h2><h4 id="运算方法和运算器"><a href="#运算方法和运算器" class="headerlink" title="运算方法和运算器"></a>运算方法和运算器</h4><p>一个定点数由符号位和数值域两部分组成。按小数点位置不同，定点数有纯小数和纯整数两种表示方法。</p>
+<p>按IEEE754 标准，一个浮点数由符号位S，阶码E，尾数M 三个域组成。其中接码E的值等于指数的真值e加上一个固定偏移值。</p>
+<p>为了使计算机能直接处理十进制形式的数据，采用两种表示形式：1.字符串形式，主要用于在非数值计算的领域；2. 压缩的十进制数串形式，用于直接完成十进制数的算术运算。</p>
+<p>数的真值编程机器码时有4种表示方法：原码表示法，反码表示法，补码表示法，移码表示法。其中移码主要用于表示浮点数的接码E，以利于比较两个指数的大小和对阶操作。</p>
+<p>字符信息术语符号数据，是处理非数值领域的问题。国际上采用的字符系统是7单位的ASCII码。</p>
+<p>直接使用西文标准键盘输入汉字，进行处理，并显示打印汉字，是一项重大成就。为此要解决汉字的输入编码，汉字内码，字模码的三种不同用途的编码。</p>
+<p>为运算器构造的简单性，运算方法中算术运算通常采用补码，剪发，原码乘除法或补码乘除法。为了运算器的高速性和控制的简单性，采用了先行进位，阵列乘除法，流水线等并行计数措施。</p>
+<p>定点运算器和浮点运算器的结构复杂程度有所不同。早起微型机中浮点运算器放在cpu芯片外，随着高密度集成电路的发展，现已移至CPU内部。</p>
+</div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

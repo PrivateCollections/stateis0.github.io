@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>本人开源项目 Lu-Rpc</title></head><body>　　<div class="inner"><h2>本人开源项目 Lu-Rpc</h2><p>Lu-Rpc 是个专为学习者准备的 RPC 框架, 初始架构非常简单, 可供初学者扩展和学习.</p>
+<p>Lu 可以认为是中文世界的撸, 即撸 Rpc— 造个 Rpc 轮子.</p>
+<p>Lu-Rpc 架构图如下:</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-8786ca05934579d5.png?imageMogr2/auto-orient/" alt></p>
+<p>Lu-Rpc 的领域模型设计借鉴 Dubbo, 服务域没有明显的界限. 核心域就是 Invoker, 非常合适作为核心领域模型的接口.</p>
+<p>会话域可以是Request,也可以是 Invocation. 这个问题不大.</p>
+<p>希望对 Dubbo， Motan，SOFA 等 RPC 感兴趣的，看过源码的，没看过源码的，都可以来接触这个项目。该项目可以让你迅速领会 RPC 框架的设计，更进一步的，如果你有兴趣，可以加入我们，一起造轮子，一起探讨 RPC 服务框架的设计！！！</p>
+<h2 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h2><p>RPC（Remote Procedure Calls）</p>
+<p>关于 RPC 的论文： <a href="http://birrell.org/andrew/papers/ImplementingRPC.pdf" target="_blank" rel="noopener">Implementing Remote Procedure Calls </a></p>
+<p>以下是论文中的 RPC 设计图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-018e51d4688bfe8f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>项目地址: <a href="https://github.com/stateIs0/Lu-Rpc" target="_blank" rel="noopener">https://github.com/stateIs0/Lu-Rpc</a></p>
+</div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>

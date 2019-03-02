@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>Raft 基础</title></head><body>　　<div class="inner"><h2>Raft 基础</h2><p>目录</p>
+<ol>
+<li>三个状态</li>
+<li>什么是任期</li>
+<li>节点之间的通信</li>
+</ol>
+<h2 id="1-三个状态"><a href="#1-三个状态" class="headerlink" title="1. 三个状态"></a>1. 三个状态</h2><p>Raft 设计了 3 个状态，用于表示节点的状态，分别是跟随者，候选者，领导者。</p>
+<ol>
+<li>领导者：通常只有一个领导人，并且其他节点都是跟随者。</li>
+<li>跟随者：跟随者不会发送任何请求，只是简单的响应领导者或者候选人的请求，由领导人处理所有的客户端请求（如果客户端请求了跟随者，那么跟随者会将请求转发给领导者）</li>
+<li>候选者：选举新的领导人时使用。</li>
+</ol>
+<p>3 个角色的转换关系和流程：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-3a3807aa671bce4f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="图 1 "></p>
+<p>可以看到，这张图里的几个概念：</p>
+<ol>
+<li>初始化：所有服务器启动时，都是跟随者</li>
+<li>超时：当初始时， 没有收到领导人的心跳，便开始选举。如果候选者选举的时候，也超时了，便重新选举。</li>
+<li>大多数的选票：成为领导人的关键是 —— 获取大多数服务器的选票，可以看做是鸽笼原理。</li>
+</ol>
+<h2 id="2-什么是任期"><a href="#2-什么是任期" class="headerlink" title="2. 什么是任期"></a>2. 什么是任期</h2><p>目录：</p>
+<ol>
+<li>2 个阶段</li>
+<li>任期</li>
+<li>服务器之间的通信</li>
+</ol>
+<p>背景：由于机器的物理时间是不可靠的，所以需要一个逻辑时间。称之为任期（term）。</p>
+<p><strong>从 2 个阶段开始说起</strong>：</p>
+<p>集群节点通常有 2 个节点：</p>
+<ol>
+<li>选举阶段</li>
+<li>领导者正常运行</li>
+</ol>
+<p>例外：当选举失败，会进行加时赛，即连续有 2 个选举过程。</p>
+<p>见下图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-d7bfb023c238c533.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="图 2"></p>
+<p>图 2 可见任期 3 选举失败，然后进行了重新选举。</p>
+<p>重新选举会继续失败吗？</p>
+<p>答：如果不做限制，是会理解失败的。</p>
+<p>Raft 使用了一个限制来规避：每台服务器在选举的时候，使用一个随机数（150 -200），即每个服务器在不同的时间发出选举。防止冲突。称之为“加时赛”。</p>
+<p><strong>任期号</strong></p>
+<p>在上文中说道：由于机器的物理时间是不可靠的，所以需要一个逻辑时间。称之为任期（term）。</p>
+<p>有关任期的几个特点：</p>
+<ol>
+<li>节点有可能观察不到任何一次选举或者任期。</li>
+<li>任期充当逻辑时钟，服务器节点可以通过任期号查明过期的领导者或过期的信息。</li>
+<li>每个节点存储当前任期号，单调递增。</li>
+<li>服务器之间的每次通信，都会交换当前任期号，交换任期号的目的：<br>4.1 如果一个服务器的当前任期号比其他人小，则更新自己。<br>4.2 如果一个候选人或者领导人发现自己的任期号过期了，立刻将自己变成跟随者状态。<br>4.3 如果一个节点收到一个过期的任期号的请求，直接拒绝。</li>
+</ol>
+<h2 id="3-节点之间的通信"><a href="#3-节点之间的通信" class="headerlink" title="3. 节点之间的通信"></a>3. 节点之间的通信</h2><p>服务器之间通过 RPC 通信，即远程方法调用。</p>
+<p>在 Raft 中，RPC 分成 3 种：</p>
+<ol>
+<li>请求投票： RequestVote 由候选人在选举任期发起</li>
+<li>附加条目 AppendEntries 由领导人发起，用来复制日志和提供心跳。</li>
+<li>为了传输快照单独增加的 RPC。</li>
+</ol>
+<p>备注：当服务没有及时收到 RPC 的响应时，会发起重试。</p>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ol>
+<li>3 个状态的意义和他们之间切换</li>
+<li>任期的设计背景，任期在节点通信时的作用，任期在增长策略。</li>
+<li>节点直接的通信 RPC 类型以及策略。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf" target="_blank" rel="noopener">英文 paper  pdf 地址</a></p>
+<p><a href="https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md" target="_blank" rel="noopener">Raft paper 中文翻译 —— 寻找一种易于理解的一致性算法（扩展版）</a></p>
+<p><a href="https://www.youtube.com/watch?v=YbZ3zDzDnrw&amp;feature=youtu.be" target="_blank" rel="noopener">Raft 作者讲解视频</a></p>
+<p><a href="http://www2.cs.uh.edu/~paris/6360/PowerPoint/Raft.ppt" target="_blank" rel="noopener">Raft 作者讲解视频对应的 PPT</a></p>
+<p><a href="http://thesecretlivesofdata.com/raft/" target="_blank" rel="noopener">一个简单的讲解 Raft 协议的动画</a></p>
+</div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
