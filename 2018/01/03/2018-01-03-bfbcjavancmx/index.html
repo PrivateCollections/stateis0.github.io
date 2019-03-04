@@ -96,35 +96,35 @@
 <p><strong>运算结果并不依赖变量的当前值，或者能够确保只有单一的线程修改变量的值。</strong><br>  我们程序的情况就是，运算结果依赖 i 当前的值，如果改为 原子操作： i = j，那么结果就会是正确的 9999.</p>
 <p>比如下面这个程序就是使用 volatile 的范例</p>
 <pre><code class="java"><span class="comment">/**</span>
-<span class="comment"> * java 内存模型：</span>
-<span class="comment"> * 单线程下会重排序。</span>
-<span class="comment"> * 下面这段程序再 -server 模式下会优化代码（重排序），导致永远死循环。</span>
+<span class="comment"> * volatile 不能保证原子性，只能遵守 hp 原则 保证单线程的有序性和可见性。</span>
 <span class="comment"> */</span>
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JMMDemo</span> </span>{
+<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultitudeTest</span> </span>{
 
-  <span class="comment">//  static boolean ready;</span>
-  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> ready;
-  <span class="keyword">static</span> <span class="keyword">int</span> num;
+  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;
 
-  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReaderThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>{
+  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PlusTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>{
 
+    <span class="meta">@Override</span>
     <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{
-      <span class="keyword">while</span> (!ready) {
+      <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) {
+        i++;
       }
-      System.out.println(num);
-
     }
   }
 
   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>{
-    <span class="keyword">new</span> ReaderThread().start();
-    Thread.sleep(<span class="number">1000</span>);
-    num = <span class="number">32</span>;
-    ready = <span class="keyword">true</span>;
-    Thread.sleep(<span class="number">1000</span>);
-    Thread.yield();
-  }
+    Thread[] threads = <span class="keyword">new</span> Thread[<span class="number">10</span>];
+    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) {
+      threads[j] = <span class="keyword">new</span> Thread(<span class="keyword">new</span> PlusTask());
+      threads[j].start();
+    }
 
+    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) {
+      threads[j].join();
+    }
+
+    System.out.println(i);
+  }
 }
 </code></pre>
 <p>这段程序很有意思，我们使用 volatile 变量来控制流程，最终的正确结果是32，但是请注意，如果你没有使用 volatile 关键字，并且虚拟机启动的时候加入了 -server参数，这段程序将永远不会结束，因为他会被 JIT 优化并且另一个线程永远无法看到变量的修改（JIT 会忽略他认为无效的代码）。当然，当你修改为 volatile 就没有任何问题了。</p>
