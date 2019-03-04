@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>深入浅出-JVM-GC（2）</title></head><body>　　<div class="inner"><h2>深入浅出-JVM-GC（2）</h2><p><img src="http://upload-images.jianshu.io/upload_images/4236553-758f77ae55e8dc6b.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="# 前言"></a># 前言</h2><p>在 <a href="https://www.jianshu.com/p/f29d013c4f46" target="_blank" rel="noopener">深入浅出 JVM GC（1）</a> 中，限于上篇文章的篇幅，我们留下了一个问题 : 如何回收？ 这篇文章将重点讲述这个问题。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>深入浅出-JVM-GC（2）</title></head><body>　　<div class="inner"><h2>深入浅出-JVM-GC（2）</h2><p>在 <a href="https://www.jianshu.com/p/f29d013c4f46" target="_blank" rel="noopener">深入浅出 JVM GC（1）</a> 中，限于上篇文章的篇幅，我们留下了一个问题 : 如何回收？ 这篇文章将重点讲述这个问题。</p>
 <p>在上篇文章中，我们也列出了一些大纲，今天我们就按照那个大纲来逐个讲解。在此，我将大纲复制过来。</p>
 <p><strong>垃圾回收算法</strong></p>
 <ol>

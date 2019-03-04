@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>Java-如何获取泛型类型</title></head><body>　　<div class="inner"><h2>Java-如何获取泛型类型</h2><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 Java 开发中，获取泛型这种操作虽不是很常用，但有时确实必须的，比如 将Json 字符串反序列化成对象的时候。今天就来介绍这个操作。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>Java-如何获取泛型类型</title></head><body>　　<div class="inner"><h2>Java-如何获取泛型类型</h2><p>在 Java 开发中，获取泛型这种操作虽不是很常用，但有时确实必须的，比如 将Json 字符串反序列化成对象的时候。今天就来介绍这个操作。</p>
 <h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p>假设我们定义了一个类，内部有一个数据结构，泛型为 T，当我们输入一个 Json 字符串，想把这个 Json 反序列化成对象，那么此时，我们就需要知道这个泛型的类型。</p>
 <p>具体代码场景如下：</p>
 <p>抽象父类（包含泛型）:</p>

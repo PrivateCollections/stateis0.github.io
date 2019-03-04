@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>分布式理论（三）——-一致性协议之-2PC</title></head><body>　　<div class="inner"><h2>分布式理论（三）——-一致性协议之-2PC</h2><p><img src="https://upload-images.jianshu.io/upload_images/4236553-618e6eaec6367296.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>为了使系统尽量能够达到 CAP，于是有了 BASE 协议，而 BASE 协议是在可用性和一致性之间做的取舍和妥协。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>分布式理论（三）——-一致性协议之-2PC</title></head><body>　　<div class="inner"><h2>分布式理论（三）——-一致性协议之-2PC</h2><p>为了使系统尽量能够达到 CAP，于是有了 BASE 协议，而 BASE 协议是在可用性和一致性之间做的取舍和妥协。</p>
 <p>人们往往需要在系统的可用性和数据一致性之间反复的权衡。于是呢，就产生我们标题中的一致性协议，而且还不止一个呢。</p>
 <p>为了解决分布式问题，涌现了很多经典的算法和协议，最著名的就是二阶段提交协议，三阶段提交协议，Paxos 算法。</p>
 <p>本文重点介绍二阶段提交协议，简称 2PC。</p>
