@@ -31,7 +31,7 @@
 </blockquote>
 <p>6 ：修改日志路径，导入到我们制定的路径。</p>
 <p> 7 ：最后我们在windows的服务列表中就能看到我们的服务了。点击启动就好了。<br>最后，我们知道tomcat容器中的应用都是要加后缀的，而我们的springboot是不加后缀的，当我们使用的jmeter的测试用 例都需要加上项目前缀，就很疼了。那怎么解决呢？ 我们只需要编辑tomcat 中的conf 目录下的server.xml 文件，在host标签中加入一行代码：</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Context path=&quot;&quot; docBase=&quot;/ccppg-service&quot; debug=&quot;0&quot; reloadable=&quot;true&quot;/&gt;</span><br></pre></td></tr></table></figure>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Context path=&quot;&quot; docBase=&quot;/ccppg-service&quot; debug=&quot;0&quot; reloadable=&quot;true&quot;/&gt;</span><br></pre></td></tr></table></figure>
 <p>path 代表的是访问的路径，docBase对应的是webapps目录的项目相对路径。reloadable=”true” 表示自动重载class文件。 这样，我们重启服务器，就不需要加项目前缀了。注意：如果你的项目里含有需要将文件上传到服务器或者保存到服务器的插件或逻辑，对这个标签必须谨慎对待，这里就是你文件上传的路径。</p>
 <p>到此，我们就完成了让springboot发挥他最大的优点：<strong>方便调试</strong>。也能够在windows中方便的维护我们的程序。不必担心一 不小心关闭了命令行导致的事故，也可以让什么都不懂的人开启或关闭服务。节约了我们的时间。</p>
 <p>现在，我们已经将程序部署到服务器上，外网页能通过ip来访问我们了，但是不够友好，我们需要使用域名映射我们的 ip，即访问域名时就转发到我们的ip，不需记住难记的数字。</p>
