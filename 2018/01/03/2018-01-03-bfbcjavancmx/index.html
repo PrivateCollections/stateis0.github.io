@@ -87,7 +87,7 @@
 <h2 id="5-Happen-Before-引出的-volatile-又是什么？"><a href="#5-Happen-Before-引出的-volatile-又是什么？" class="headerlink" title="5. Happen-Before 引出的 volatile 又是什么？"></a>5. Happen-Before 引出的 volatile 又是什么？</h2><p>我们在前面，说了很多的 volatile 关键字，可见这个关键字非常的重要，但似乎他的使用频率比 synchronized<br> 少多了，我们知道了这个关键字可以做什么呢？</p>
 <p>volatile 可以实现线程的可见性，还可以实现线程的有序性。但是不能实现原子性。</p>
 <p>我们还是直接写一段代码吧！</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.think.in.java.two;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * volatile 不能保证原子性，只能遵守 hp 原则 保证单线程的有序性和可见性。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultitudeTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PlusTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) &#123;</span><br><span class="line"><span class="comment">//        plusI();</span></span><br><span class="line">        i++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    Thread[] threads = <span class="keyword">new</span> Thread[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">      threads[j] = <span class="keyword">new</span> Thread(<span class="keyword">new</span> PlusTask());</span><br><span class="line">      threads[j].start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">      threads[j].join();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    System.out.println(i);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//  static synchronized void plusI() &#123;</span></span><br><span class="line"><span class="comment">//    i++;</span></span><br><span class="line"><span class="comment">//  &#125;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * volatile 不能保证原子性，只能遵守 hp 原则 保证单线程的有序性和可见性。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultitudeTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PlusTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) &#123;</span><br><span class="line">        i++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    Thread[] threads = <span class="keyword">new</span> Thread[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">      threads[j] = <span class="keyword">new</span> Thread(<span class="keyword">new</span> PlusTask());</span><br><span class="line">      threads[j].start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">      threads[j].join();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    System.out.println(i);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>我们启动了10个线程分别对一个 int 变量进行 ++ 操作，注意，++ 符号不是原子的。然后，主线程等待在这10个线程上，执行结束后打印 int 值。你会发现，无论怎么运行都到不了10000，因为他不是原子的。怎么理解呢？ </p>
 <p>i++ 等于 i = i + 1；</p>
 <p>虚拟机首先读取 i 的值，然后在 i 的基础上加1，请注意，volatile 保证了线程读取的值是最新的，当线程读取 i 的时候，该值确实是最新的，但是有10个线程都去读了，他们读到的都是最新的，并且同时加1，这些操作不违法 volatile 的定义。最终出现错误，可以说是我们使用不当。</p>
@@ -95,22 +95,20 @@
 <p>那么，什么时候用 volatile 呢？</p>
 <p><strong>运算结果并不依赖变量的当前值，或者能够确保只有单一的线程修改变量的值。</strong><br>  我们程序的情况就是，运算结果依赖 i 当前的值，如果改为 原子操作： i = j，那么结果就会是正确的 9999.</p>
 <p>比如下面这个程序就是使用 volatile 的范例</p>
-<pre><code class="java"><span class="keyword">package</span> cn.think.in.java.two;
-
-<span class="comment">/**</span>
+<pre><code class="javascript"><span class="comment">/**</span>
 <span class="comment"> * java 内存模型：</span>
 <span class="comment"> * 单线程下会重排序。</span>
 <span class="comment"> * 下面这段程序再 -server 模式下会优化代码（重排序），导致永远死循环。</span>
 <span class="comment"> */</span>
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JMMDemo</span> </span>{
+public <span class="class"><span class="keyword">class</span> <span class="title">JMMDemo</span> </span>{
 
   <span class="comment">//  static boolean ready;</span>
-  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> ready;
-  <span class="keyword">static</span> <span class="keyword">int</span> num;
+  <span class="keyword">static</span> volatile boolean ready;
+  <span class="keyword">static</span> int num;
 
   <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReaderThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>{
 
-    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{
+    public <span class="keyword">void</span> run() {
       <span class="keyword">while</span> (!ready) {
       }
       System.out.println(num);
@@ -118,11 +116,11 @@
     }
   }
 
-  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>{
+  public <span class="keyword">static</span> <span class="keyword">void</span> main(<span class="built_in">String</span>[] args) throws InterruptedException {
     <span class="keyword">new</span> ReaderThread().start();
     Thread.sleep(<span class="number">1000</span>);
     num = <span class="number">32</span>;
-    ready = <span class="keyword">true</span>;
+    ready = <span class="literal">true</span>;
     Thread.sleep(<span class="number">1000</span>);
     Thread.yield();
   }
