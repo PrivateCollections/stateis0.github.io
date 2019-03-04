@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>并发编程之-Java-内存模型-+-volatile-关键字-+-Happen-Before-规则</title></head><body>　　<div class="inner"><h2>并发编程之-Java-内存模型-+-volatile-关键字-+-Happen-Before-规则</h2><p>楼主这个标题其实有一种作死的味道，为什么呢，这三个东西其实可以分开为三篇文章来写，但是，楼主认为这三个东西又都是高度相关的，应当在一个知识点中。在一次学习中去理解这些东西。才能更好的理解 Java 内存模型和 volatile 关键字还有 HB 原则。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>并发编程之Java内存模型+volatile关键字+HappenBefore规则</title></head><body>　　<div class="inner"><h2>并发编程之Java内存模型+volatile关键字+HappenBefore规则</h2><p>楼主这个标题其实有一种作死的味道，为什么呢，这三个东西其实可以分开为三篇文章来写，但是，楼主认为这三个东西又都是高度相关的，应当在一个知识点中。在一次学习中去理解这些东西。才能更好的理解 Java 内存模型和 volatile 关键字还有 HB 原则。</p>
 <p>楼主今天就尝试着在一篇文章中讲述这三个问题，最后总结。</p>
 <ol>
 <li>讲并发知识前必须复习的硬件知识。</li>
@@ -26,12 +26,7 @@
 <p><img src="http://upload-images.jianshu.io/upload_images/4236553-a5c9a6acadf4eef8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Java 内存模型（Java Memory Model）"></p>
 <p>好了，关于为什么会有内存模型这件事，我们已经说的差不多了，总体来说就是因为多个CPU的多级缓存访问同一个内存条可能会导致数据不一致。所以需要一个协议，让这些处理器在访问内存的时候遵守这些协议保证数据的一致性。</p>
 <h5 id="还有一个问题。CPU-的流水线执行和乱序执行"><a href="#还有一个问题。CPU-的流水线执行和乱序执行" class="headerlink" title="还有一个问题。CPU 的流水线执行和乱序执行"></a>还有一个问题。CPU 的流水线执行和乱序执行</h5><p>我们假设我们现在有一段代码：</p>
-<pre><code class="java">
-int a = 1;
-int b = 2;
-int c = a + b;
-
-</code></pre>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> c = a + b;</span><br></pre></td></tr></table></figure>
 <p>上面的代码我们能不能不顺序动一下并且结果不变呢？可以，第一行和第二行调换没有任何问题。</p>
 <p>实际上，CPU 有时候为了优化性能，也会对代码顺序进行调换（在保证结果的前提下），专业术语叫重排序。为什么重排序会优化性能呢？</p>
 <p>这个就有点复杂了，我们慢慢说。</p>
@@ -92,47 +87,7 @@ int c = a + b;
 <h2 id="5-Happen-Before-引出的-volatile-又是什么？"><a href="#5-Happen-Before-引出的-volatile-又是什么？" class="headerlink" title="5. Happen-Before 引出的 volatile 又是什么？"></a>5. Happen-Before 引出的 volatile 又是什么？</h2><p>我们在前面，说了很多的 volatile 关键字，可见这个关键字非常的重要，但似乎他的使用频率比 synchronized<br> 少多了，我们知道了这个关键字可以做什么呢？</p>
 <p>volatile 可以实现线程的可见性，还可以实现线程的有序性。但是不能实现原子性。</p>
 <p>我们还是直接写一段代码吧！</p>
-<pre><code class="java">package cn.think.in.java.two;
-
-/**
- * volatile 不能保证原子性，只能遵守 hp 原则 保证单线程的有序性和可见性。
- */
-public class MultitudeTest {
-
-  static volatile int i = 0;
-
-  static class PlusTask implements Runnable {
-
-    @Override
-    public void run() {
-      for (int j = 0; j &lt; 10000; j++) {
-//        plusI();
-        i++;
-      }
-    }
-  }
-
-  public static void main(String[] args) throws InterruptedException {
-    Thread[] threads = new Thread[10];
-    for (int j = 0; j &lt; 10; j++) {
-      threads[j] = new Thread(new PlusTask());
-      threads[j].start();
-    }
-
-    for (int j = 0; j &lt; 10; j++) {
-      threads[j].join();
-    }
-
-    System.out.println(i);
-  }
-
-//  static synchronized void plusI() {
-//    i++;
-//  }
-
-}
-
-</code></pre>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.think.in.java.two;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * volatile 不能保证原子性，只能遵守 hp 原则 保证单线程的有序性和可见性。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultitudeTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">PlusTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) &#123;</span><br><span class="line"><span class="comment">//        plusI();</span></span><br><span class="line">        i++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    Thread[] threads = <span class="keyword">new</span> Thread[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">      threads[j] = <span class="keyword">new</span> Thread(<span class="keyword">new</span> PlusTask());</span><br><span class="line">      threads[j].start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++) &#123;</span><br><span class="line">      threads[j].join();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    System.out.println(i);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//  static synchronized void plusI() &#123;</span></span><br><span class="line"><span class="comment">//    i++;</span></span><br><span class="line"><span class="comment">//  &#125;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>我们启动了10个线程分别对一个 int 变量进行 ++ 操作，注意，++ 符号不是原子的。然后，主线程等待在这10个线程上，执行结束后打印 int 值。你会发现，无论怎么运行都到不了10000，因为他不是原子的。怎么理解呢？ </p>
 <p>i++ 等于 i = i + 1；</p>
 <p>虚拟机首先读取 i 的值，然后在 i 的基础上加1，请注意，volatile 保证了线程读取的值是最新的，当线程读取 i 的时候，该值确实是最新的，但是有10个线程都去读了，他们读到的都是最新的，并且同时加1，这些操作不违法 volatile 的定义。最终出现错误，可以说是我们使用不当。</p>
@@ -140,40 +95,41 @@ public class MultitudeTest {
 <p>那么，什么时候用 volatile 呢？</p>
 <p><strong>运算结果并不依赖变量的当前值，或者能够确保只有单一的线程修改变量的值。</strong><br>  我们程序的情况就是，运算结果依赖 i 当前的值，如果改为 原子操作： i = j，那么结果就会是正确的 9999.</p>
 <p>比如下面这个程序就是使用 volatile 的范例</p>
-<pre><code>package cn.think.in.java.two;
+<pre><code class="java"><span class="keyword">package</span> cn.think.in.java.two;
 
-/**
- * java 内存模型：
- * 单线程下会重排序。
- * 下面这段程序再 -server 模式下会优化代码（重排序），导致永远死循环。
- */
-public class JMMDemo {
+<span class="comment">/**</span>
+<span class="comment"> * java 内存模型：</span>
+<span class="comment"> * 单线程下会重排序。</span>
+<span class="comment"> * 下面这段程序再 -server 模式下会优化代码（重排序），导致永远死循环。</span>
+<span class="comment"> */</span>
+<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JMMDemo</span> </span>{
 
-  //  static boolean ready;
-  static volatile boolean ready;
-  static int num;
+  <span class="comment">//  static boolean ready;</span>
+  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> ready;
+  <span class="keyword">static</span> <span class="keyword">int</span> num;
 
-  static class ReaderThread extends Thread {
+  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReaderThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>{
 
-    public void run() {
-      while (!ready) {
+    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{
+      <span class="keyword">while</span> (!ready) {
       }
       System.out.println(num);
 
     }
   }
 
-  public static void main(String[] args) throws InterruptedException {
-    new ReaderThread().start();
-    Thread.sleep(1000);
-    num = 32;
-    ready = true;
-    Thread.sleep(1000);
+  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>{
+    <span class="keyword">new</span> ReaderThread().start();
+    Thread.sleep(<span class="number">1000</span>);
+    num = <span class="number">32</span>;
+    ready = <span class="keyword">true</span>;
+    Thread.sleep(<span class="number">1000</span>);
     Thread.yield();
   }
 
 }
-</code></pre><p>这段程序很有意思，我们使用 volatile 变量来控制流程，最终的正确结果是32，但是请注意，如果你没有使用 volatile 关键字，并且虚拟机启动的时候加入了 -server参数，这段程序将永远不会结束，因为他会被 JIT 优化并且另一个线程永远无法看到变量的修改（JIT 会忽略他认为无效的代码）。当然，当你修改为 volatile 就没有任何问题了。</p>
+</code></pre>
+<p>这段程序很有意思，我们使用 volatile 变量来控制流程，最终的正确结果是32，但是请注意，如果你没有使用 volatile 关键字，并且虚拟机启动的时候加入了 -server参数，这段程序将永远不会结束，因为他会被 JIT 优化并且另一个线程永远无法看到变量的修改（JIT 会忽略他认为无效的代码）。当然，当你修改为 volatile 就没有任何问题了。</p>
 <p>通过上面的代码，我们知道了，volatile 确实不能保证原子性，但是能保证有序性和可见性。那么是怎么实现的呢？</p>
 <p>怎么保证有序性呢？实际上，在操作 volatile 关键字变量前后的汇编代码中，会有一个 lock 前缀，根据 <a href="https://www.intel.cn/content/www/cn/zh/architecture-and-technology/64-ia-32-architectures-software-developer-manual-325462.html" target="_blank" rel="noopener">intel IA32 手册</a>，lock 的作用是 使得 本 CPU 的Cache 写入了内存，该写入动作也会引起别的CPU或者别的内核无效化其Cache，别的CPU需要重新获取Cache。这样就实现了可见性。可见底层还是使用的 CPU 的指令。</p>
 <p>如何实现有序性呢？同样是lock 指令，这个指令还相当于一个内存屏障（<code>大多数现代计算机为了提高性能而采取乱序执行，这使得内存屏障成为必须。语义上，内存屏障之前的所有写操作都要写入内存；内存屏障之后的读操作都可以获得同步屏障之前的写操作的结果。因此，对于敏感的程序块，写操作之后、读操作之前可以插入内存屏障</code>），指的是，重排序时不能把后面的指令重排序到内存屏障之前的位置。只有一个CPU访问内存时，并不需要内存屏障；但如果有两个或者更多CPU访问同一块内存，且其中有一个在观测另一个，就需要内存屏障来保证了。</p>
