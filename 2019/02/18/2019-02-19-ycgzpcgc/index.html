@@ -6,7 +6,7 @@
 <p>LZ 使用的是 mac，使用 mat（Mac 的 mat 有 bug，需要替换一个 jar 包，具体自行搜索） 开始分析，发现内存中有 1个多 g 的 indexService 对象（600 多），即 ES 的索引对象，通过和 ES 同学的沟通，确实发现有 600 多索引，有很多都是国企索引，通常一台 ES 差不多配置 100-200 索引，大量索引引起更新，频繁更新索引对象。</p>
 <p>最后，将ES 内存升级到 4g，<code>-XX:CMSInitiatingOccupancyFraction</code> 修改为75，减少 CMS GC。删除 ES 无效索引。问题解决。</p>
 <p>后期为了检验结果，使用 jvisualvm 连上服务器 Java 进程： 登录到目标服务器，创建文件 <code>jstatd.all.policy</code>，文件内容：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">grant codebase <span class="string">"file:$&#123;java.home&#125;/../lib/tools.jar"</span> &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grant codebase <span class="string">"file:$&#123;java.home&#125;/../lib/tools.jar"</span> &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>执行 <code>jstatd -J-Djava.security.policy=jstatd.all.policy -p 1222 &amp;</code>, 启动 jstatd 后台服务，方便 <code>jvisualvm</code> 连接到这台服务器的 Java 进程。找到本机 Java 目录下的 VisualVM ,连接上目标 ip 和 1222 端口服务，安装 GC 插件，查看 GC 状态。</p>
 <p>EOF</p>
 </div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
