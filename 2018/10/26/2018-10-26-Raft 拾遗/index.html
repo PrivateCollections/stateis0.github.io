@@ -7,7 +7,7 @@
 <li>平均故障间隔时间（MTBF）：平均故障间隔时间就是对于一台服务器而言，两次故障之间的平均时间。</li>
 </ol>
 <p>Raft 规定，只要系统满足下面的时间要求，就可以选举并维持一个稳定的领导人。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">广播时间（broadcastTime） &lt;&lt; 选举超时时间（electionTimeout） &lt;&lt; 平均故障间隔时间（MTBF）</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">广播时间（broadcastTime） &lt;&lt; 选举超时时间（electionTimeout） &lt;&lt; 平均故障间隔时间（MTBF）</span><br></pre></td></tr></table></figure>
 <p>通常广播时间比选举超时时间小一个数量级，这样 leader 才能发送稳定的心跳来阻止跟随者进入选举状态；</p>
 <p>选举超时时间一般比 MTBF 小几个数量级，这样整个系统才能正常运行。当 leader 崩溃后，整个系统的不可用时间，大约相当于选举时间超时时间。</p>
 <p>广播时间和 MTBF 是由系统决定的，只有选举超时时间是我们自己选择的，通常广播时间大约是 0.5 毫秒到 20 毫秒（持久化需要时间），那么，选举超时时间通常在 10 毫秒 到 500 毫秒之间。</p>
