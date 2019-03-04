@@ -95,20 +95,20 @@
 <p>那么，什么时候用 volatile 呢？</p>
 <p><strong>运算结果并不依赖变量的当前值，或者能够确保只有单一的线程修改变量的值。</strong><br>  我们程序的情况就是，运算结果依赖 i 当前的值，如果改为 原子操作： i = j，那么结果就会是正确的 9999.</p>
 <p>比如下面这个程序就是使用 volatile 的范例</p>
-<pre><code class="javascript"><span class="comment">/**</span>
+<pre><code class="java"><span class="comment">/**</span>
 <span class="comment"> * java 内存模型：</span>
 <span class="comment"> * 单线程下会重排序。</span>
 <span class="comment"> * 下面这段程序再 -server 模式下会优化代码（重排序），导致永远死循环。</span>
 <span class="comment"> */</span>
-public <span class="class"><span class="keyword">class</span> <span class="title">JMMDemo</span> </span>{
+<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JMMDemo</span> </span>{
 
   <span class="comment">//  static boolean ready;</span>
-  <span class="keyword">static</span> volatile boolean ready;
-  <span class="keyword">static</span> int num;
+  <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> ready;
+  <span class="keyword">static</span> <span class="keyword">int</span> num;
 
   <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReaderThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>{
 
-    public <span class="keyword">void</span> run() {
+    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{
       <span class="keyword">while</span> (!ready) {
       }
       System.out.println(num);
@@ -116,11 +116,11 @@ public <span class="class"><span class="keyword">class</span> <span class="title
     }
   }
 
-  public <span class="keyword">static</span> <span class="keyword">void</span> main(<span class="built_in">String</span>[] args) throws InterruptedException {
+  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>{
     <span class="keyword">new</span> ReaderThread().start();
     Thread.sleep(<span class="number">1000</span>);
     num = <span class="number">32</span>;
-    ready = <span class="literal">true</span>;
+    ready = <span class="keyword">true</span>;
     Thread.sleep(<span class="number">1000</span>);
     Thread.yield();
   }
