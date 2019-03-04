@@ -154,19 +154,19 @@ img.displayed {
   display: block;
 }
 
-/*div{*/
-  /*width: 65%;*/
-  /*height: 65%;*/
-  /*border: #000 solid 1px;*/
-  /*overflow: hidden;   !*超出部分隐藏*!*/
-/*}*/
-/*div img{*/
-  /*cursor: pointer;   !*让鼠标显示小手*!*/
-  /*transition:0.2s;   !*过渡时间(缓慢放大时间)*!*/
-/*}*/
-/*div img:hover{*/
-  /*transform: scale(2.02);   !*放大*!*/
-/*}*/
+div{
+  width: 65%;
+  height: 65%;
+  border: #000 solid 1px;
+  overflow: hidden;   /*超出部分隐藏*/
+}
+div img{
+  cursor: pointer;   /*让鼠标显示小手*/
+  transition:0.2s;   /*过渡时间(缓慢放大时间)*/
+}
+div img:hover{
+  transform: scale(2.02);   /*放大*/
+}
 
 hr {
   color: LightGrey;
