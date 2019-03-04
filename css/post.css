@@ -93,6 +93,10 @@ pre {
   white-space: pre;
 }
 
+figure {
+  width: 100%;
+}
+
 code {
   font-family: Inconsolata, Consolas, "DEJA VU SANS MONO", "DROID SANS MONO", Proggy, monospace;
 
