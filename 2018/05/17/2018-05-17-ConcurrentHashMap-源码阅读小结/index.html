@@ -24,7 +24,7 @@
 <li>size 方法不准确，原因是由于并发插入，baseCount 难以及时更新。计数盒子也难以及时更新。</li>
 <li>内部通过两个变量，一个是 baseCount，一个是 counterCells，counterCells 是并发修改 baseCount 后的备用方案。</li>
 <li>具体更新 baseCount 和 counterCells 是在 addCount 方法中。备用方法 fullAddCount 则会死循环插入。</li>
-<li>CounterCell 是一个用于分配计数的填充单元，改编自 LongAdder和Striped64。内部只有一个 volatile 的 value 变量，同时这个类标记了 <a href="mailto:`@sun.misc.Contended" target="_blank" rel="noopener">`@sun.misc.Contended</a> `，这是一个避免伪共享的注解，用于替代之前的缓存行填充。多线程情况下，注解让性能提升 5 倍。</li>
+<li>CounterCell 是一个用于分配计数的填充单元，改编自 LongAdder和Striped64。内部只有一个 volatile 的 value 变量，同时这个类标记了 <code>sun.misc.Contended</code>，这是一个避免伪共享的注解，用于替代之前的缓存行填充。多线程情况下，注解让性能提升 5 倍。</li>
 </ol>
 <h2 id="helpTransfer-方法总结"><a href="#helpTransfer-方法总结" class="headerlink" title="helpTransfer 方法总结"></a>helpTransfer 方法总结</h2><ol>
 <li>当 Cmap 尝试插入的时候，发现该节点是 forward 类型，则会帮助其扩容。</li>

@@ -20,7 +20,7 @@
 <p><img src="https://upload-images.jianshu.io/upload_images/4236553-a9a7cd9076a24321.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 <p>而这个 CounterCell 类又是上面鬼呢？</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 一种用于分配计数的填充单元。改编自LongAdder和Striped64。请查看他们的内部文档进行解释。</span></span><br><span class="line"><span class="meta">@sun</span>.misc.Contended </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">CounterCell</span> </span>&#123;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">long</span> value;</span><br><span class="line">    CounterCell(<span class="keyword">long</span> x) &#123; value = x; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>使用了 @sun.misc.Contended  标记的类，内部一个 volatile 变量。注释说，改编自LongAdder和Striped64,关于这两个类，请看 <a href="http://ifeve.com/java8-striped64-and-longadder/" target="_blank" rel="noopener">Java8 Striped64 和 LongAdder</a>。</p>
+<p>使用了 sun.misc.Contended  标记的类，内部一个 volatile 变量。注释说，改编自LongAdder和Striped64,关于这两个类，请看 <a href="http://ifeve.com/java8-striped64-and-longadder/" target="_blank" rel="noopener">Java8 Striped64 和 LongAdder</a>。</p>
 <p>而关于这个注解，有必要解释一下。这个注解标识着这个类防止需要防止 “伪共享”.</p>
 <p>说说伪共享。引用 一下别人的说法：</p>
 <blockquote>
@@ -32,5 +32,5 @@
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>好了，关于 Size 方法就简单介绍到这里。总结一下：</p>
 <p>JDK 8 推荐使用mappingCount 方法，因为这个方法的返回值是 long 类型，不会因为 size 方法是 int 类型限制最大值（size 方法是接口定义的，不能修改）。</p>
 <p>在没有并发的情况下，使用一个 baseCount volatile 变量就足够了，当并发的时候，CAS 修改 baseCount 失败后，就会使用 CounterCell 类了，会创建一个这个对象，通常对象的 volatile value 属性是 1。在计算 size 的时候，会将 baseCount 和 CounterCell 数组中的元素的 value 累加，得到总的大小，但这个数字仍旧可能是不准确的。</p>
-<p>还有一个需要注意的地方就是，这个 CounterCell 类使用了 @sun.misc.Contended  注解标识，这个注解是防止伪共享的。是 1.8 新增的。使用时，需要加上 <code>-XX:-RestrictContended</code> 参数。</p>
+<p>还有一个需要注意的地方就是，这个 CounterCell 类使用了 sun.misc.Contended  注解标识，这个注解是防止伪共享的。是 1.8 新增的。使用时，需要加上 <code>-XX:-RestrictContended</code> 参数。</p>
 </div><script src="/js/jquery.min.js"></script><script src="/js/main.js"></script></body></html>
