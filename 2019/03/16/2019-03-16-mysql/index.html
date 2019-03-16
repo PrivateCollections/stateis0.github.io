@@ -61,7 +61,7 @@
 <p>使用锁之后，就能在 RR 级别下，避免幻读。当然，默认的 MVCC 读，也能避免幻读。</p>
 <p>既然 RR 能够防止幻读，那么，SERIALIZABLE 有啥用呢？</p>
 <p>防止丢失更新。例如下图：</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/4236553-8804c1a77e66e863.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4236553-33cd8f28d4539270.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
 <p>这个时候，我们必须使用 SERIALIZABLE 级别进行串行读取。</p>
 <p>最后，行锁的实现原理就是锁住聚集索引，如果你查询的时候，没有正确地击中索引，MySql 优化器将会抛弃行锁，使用表锁。</p>
 <h3 id="3-事务"><a href="#3-事务" class="headerlink" title="3. 事务"></a>3. 事务</h3><p>事务是数据库永恒不变的话题， ACID：原子性，一致性，隔离性，持久性。</p>
