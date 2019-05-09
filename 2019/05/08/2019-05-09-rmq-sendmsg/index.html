@@ -18,8 +18,7 @@
 <p>这端代码里，有个有趣的地方，可以提一下，关于更新故障时间的策略，RMQ 有一个类 MQFaultStrategy，用来处理 MQ 错误，然后对 MQ Server 进行服务降级。</p>
 <p>对照图:</p>
 <p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1g2uoza9kz9j30c2068a9x.jpg" alt></p>
-<p>这个策略具体内容：如果发送一条消息在 100 毫秒以内，那么就不用降级，如果550 毫秒以内，就进行容错降级（熔断）30 秒，以此类推。</p>
-<p>再看 DefaultMQProducerImpl # sendKernelImpl 发送到内核的方法实现。</p>
+<p>这个策略具体内容：如果发送一条消息在 550 毫秒以内，那么就不用降级，如果 550 毫秒以外，就进行容错降级（熔断）30 秒，以此类推。<br>再看 DefaultMQProducerImpl # sendKernelImpl 发送到内核的方法实现。</p>
 <p>先找到 broker 的地址。尝试压缩大于 4M 的消息（批量消息不压缩）。执行各种钩子。构造 Request 对象（存放数据），Context 上下文对象（存放调用上下文）。</p>
 <p>这里会设置一个消息生成时间，即 bornTimestamp。后面使用消息轨迹的时候，可以查看。</p>
 <p>最后，如果是 SYNC 模式，就调用 MQClientAPIImpl 来发送消息，这一层还是在 Client 模块里，在这一层，会设置更详细的消息细节，构造命令对象。最后调用 remotingClient # invokeSync 发送消息。</p>
