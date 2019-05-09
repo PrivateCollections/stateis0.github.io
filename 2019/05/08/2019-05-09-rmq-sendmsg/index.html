@@ -87,7 +87,7 @@
 <p>简单说下异步刷盘：</p>
 <ol>
 <li>默认刷盘 4 页，也就是 4kb。</li>
-<li>如果写的数据减去已经刷的数据，剩下的数据大于等于 4 页，就执行刷盘。使用 dstat 可以看到，基本每次都是 4096B 的写入。</li>
+<li>如果写的数据减去已经刷的数据，剩下的数据大于等于 4 页，就执行刷盘。Linux 一页是  4kb 数据，4页就是 16kb。</li>
 <li>执行 mappedByteBuffer.force() 或者 fileChannel.force(false);</li>
 </ol>
 <p>我们这里小结一下，看看 RMQ Server 处理处理一条消息的：</p>
