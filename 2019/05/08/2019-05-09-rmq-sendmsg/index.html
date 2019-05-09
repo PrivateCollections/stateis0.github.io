@@ -1,13 +1,23 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>RocketMQ 发送消息（一条消息从发送到存储的过程）</title></head><body>　　<div class="inner"><h2>RocketMQ 发送消息（一条消息从发送到存储的过程）</h2><p>RocketMQ 目前在国内应该是比较流行的 MQ 了，楼主目前也在使用中，今天借着本文，理理 RocketMQ 发送一条消息到存储一条消息的过程。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="stylesheet" href="/css/post.css"><link rel="icon" href="/img/favicon.ico"><title>RocketMQ 发送消息（一条消息从发送到存储的过程）</title></head><body>　　<div class="inner"><h2>RocketMQ 发送消息（一条消息从发送到存储的过程）</h2><p>目录:</p>
+<ul>
+<li>前言</li>
+<li>quickStart</li>
+<li>单刀直入</li>
+<li>Remoting 模块发送消息实现</li>
+<li>如何处理返回值</li>
+<li>Broker Server 处理消息流程</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>RocketMQ 目前在国内应该是比较流行的 MQ 了，楼主目前也在使用中，今天借着本文，理理 RocketMQ 发送一条消息到存储一条消息的过程。</p>
 <p>注意：本文主线是发送到存储，因此，阅读源码时，其他和这条线相关度不高的代码，会酌情阅读。另外，本文的目的是为了看清一条消息是如何被发出且被存储的，代码中，关于 MQ 文件系统的优化，设计等，并不会花很多篇幅介绍。</p>
 <h2 id="quickStart"><a href="#quickStart" class="headerlink" title="quickStart"></a>quickStart</h2><p>来自官方源码 example 的一段发送代码：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(<span class="string">"ProducerGroupName"</span>);</span><br><span class="line">producer.start();</span><br><span class="line"></span><br><span class="line">Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicTest"</span>, <span class="string">"TagA"</span>, <span class="string">"OrderID188"</span>, <span class="string">"Hello world"</span>.getBytes(RemotingHelper.DEFAULT_CHARSET));</span><br><span class="line">SendResult sendResult = producer.send(msg);</span><br><span class="line">System.out.printf(<span class="string">"%s%n"</span>, sendResult);</span><br><span class="line"></span><br><span class="line">producer.shutdown();</span><br></pre></td></tr></table></figure>
 <h2 id="单刀直入"><a href="#单刀直入" class="headerlink" title="单刀直入"></a>单刀直入</h2><p>我们直接看看 send 方法。</p>
 <p>send 方法会设置一个默认的 timeout， 3 秒。<br>默认使用 SYNC 模式，另外有 Async 和 OneWay 模式。<br>我们需要处理方法签名中的 Client 端的异常，网络异常，Broker 端的异常，线程中断异常。</p>
 <p>DefaultMQProducerImpl # sendDefaultImpl 方法就是发送的主要逻辑。</p>
-<p><img src="https://ws4.sinaimg.cn/large/006tNc79ly1g2uotxd3rbj30ig0hcdgf.jpg" alt></p>
+<p><img src="https://ws4.sinaimg.cn/large/006tNc79ly1g2uotxd3rbj30ig0hcdgf.jpg" alt="1212"></p>
 <p>这端代码里，有个有趣的地方，可以提一下，关于更新故障时间的策略，RMQ 有一个类 MQFaultStrategy，用来处理 MQ 错误，然后对 MQ Server 进行服务降级。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1g2uoza9kz9j30c2068a9x.jpg" alt></p>
+<p>对照图:</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1g2uoza9kz9j30c2068a9x.jpg" alt="2121"></p>
 <p>这个策略具体内容：如果发送一条消息在 100 毫秒以内，那么就不用降级，如果550 毫秒以内，就进行容错降级（熔断）30 秒，以此类推。</p>
 <p>再看 DefaultMQProducerImpl # sendKernelImpl 发送到内核的方法实现。</p>
 <p>先找到 broker 的地址。尝试压缩大于 4M 的消息（批量消息不压缩）。执行各种钩子。构造 Request 对象（存放数据），Context 上下文对象（存放调用上下文）。</p>
