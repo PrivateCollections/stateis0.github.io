@@ -32,7 +32,7 @@
 </ol>
 <h2 id="纯粹读测试"><a href="#纯粹读测试" class="headerlink" title="纯粹读测试"></a>纯粹读测试</h2><p>1GB 文件：</p>
 <p>测试 MappedByteBuffer &amp; FileChannel &amp; RandomAccessFile &amp; FileInputStream.</p>
-<p><img src="http://thinkinjava.cn/img/2019/5/QQ20190522-110833.png" alt="大图"></p>
+<p><img src="http://thinkinjava.cn/img/2019/5/QQ20190522-110833.png" alt></p>
 <p>从这张图里，我们看到，mmap   性能完胜，特别是在小数据量的情况下。其他的流，只有在4kb 的情况下，才开始反杀 mmap。<strong>因此，读 4kb 以下的数据，请使用 mmap。</strong></p>
 <p>再放大看看 mmap 和 FileChannel 的比较：</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/4236553-5a8085205bae036f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="缩放图"></p>
