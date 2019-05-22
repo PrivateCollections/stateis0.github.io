@@ -5,7 +5,7 @@
 <h2 id="看看善于利用-IO-零拷贝的-MQ-们"><a href="#看看善于利用-IO-零拷贝的-MQ-们" class="headerlink" title="看看善于利用 IO 零拷贝的 MQ 们"></a>看看善于利用 IO 零拷贝的 MQ 们</h2><p>我们知道，Java 世界有很多 MQ：ActiveMQ，kafka，RocketMQ，去哪儿 MQ，而他们则是 Java 世界使用 NIO 零拷贝的大户。</p>
 <p>然而，他们的性能却大相同，抛开其他的因素，例如网络传输方式，数据结构设计，文件存储方式，我们仅仅讨论 Broker 端对文件的读写，看看他们有什么不同。</p>
 <p>下图是楼主查看源码总结的各个 MQ 使用的文件读写方式。</p>
-<p><img src="source/img/2019/5/QQ20190522-110035.png" alt></p>
+<p><img src="img/2019/5/QQ20190522-110035.png" alt></p>
 <ul>
 <li>kafka：record 的读写都是基于 FileChannel。index 读写基于 MMAP（厮大提示）。</li>
 <li>RocketMQ：读盘基于 MMAP，写盘默认使用 MMAP，可通过修改配置，配置成 FileChannel，原因是作者想避免 PageCache 的锁竞争，通过两层架构实现读写分离。</li>
